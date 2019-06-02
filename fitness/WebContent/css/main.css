@@ -1,0 +1,31 @@
+@charset "UTF-8";
+
+
+.nav {
+	background-color: pink;
+}
+
+.dropManu {
+	float: right;
+}
+
+.drop-con {
+	display: none;
+}
+
+.drop-con a {
+	display: block;
+}
+
+.dropManu:hover .drop-con {
+	display: block;
+	position: absolute;
+}
+
+.footer h4 {
+	text-align: center;	
+}
+
+a {
+	text-decoration: none;
+}

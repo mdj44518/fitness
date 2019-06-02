@@ -1,0 +1,17 @@
+@charset "UTF-8";
+
+.default-form {
+	margin: 0 auto;
+	text-align: center;
+	width: 400px;
+}
+
+.label1 {
+	display: inline-block;
+	width: 100px;
+	text-align: right;
+}
+
+fieldset {
+	margin : 15px;
+}
