@@ -76,23 +76,23 @@ public class FitnessDAO {
 		return -1;
 	}
 	
-//	public static void main(String[] args) {
-//		FitnessDAO dao = new FitnessDAO();
-//		Member m = new Member();
-//		m.setAddress("경기도");
-//		m.setBirthday("2012-02-23");
-//		m.setEndDay("2019-08-02");
-//		m.setGender("male");
-//		m.setMemberType("일반");
-//		m.setmName("홍길동");
-//		m.setPhone("010-1234-1234");
-//		m.setStartDay("2019-06-01");
-//		dao.addMember(m);
-//		for (int i = 0; i < 20; i++) {
-//			m.setmName("홍군" + i);
-//			dao.addMember(m);
-//		}
-//	}
+	public static void main(String[] args) {
+		FitnessDAO dao = new FitnessDAO();
+		Member m = new Member();
+		m.setAddress("경기도");
+		m.setBirthday("2012-02-23");
+		m.setEndDay("2019-08-02");
+		m.setGender("male");
+		m.setMemberType("일반");
+		m.setmName("홍길동");
+		m.setPhone("010-1234-1234");
+		m.setStartDay("2019-06-01");
+		dao.addMember(m);
+		for (int i = 1; i <= 20; i++) {
+			m.setmName("홍군" + i);
+			dao.addMember(m);
+		}
+	}
 
 	private int getMemberNum() {
 		Connection conn = getConnection();

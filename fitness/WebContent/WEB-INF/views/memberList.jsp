@@ -34,18 +34,20 @@
 			</tr>
 			<% if (members != null) { %>
 			<% for (int i = 0; i < members.length; i++) { %>
+			<form>
 			<tr>
-				<td><%= members[i].getMemberNum() %></td>
-				<td><%= members[i].getmName() %></td>
-				<td><%= members[i].getGender() %></td>
-				<td><%= members[i].getPhone() %></td>
-				<td><%= members[i].getStartDay() %></td>
-				<td><%= members[i].getEndDay() %></td>
-				<td><%= members[i].getMemberType() %></td>
-				<td><%= members[i].getAddress() %></td>
-				<td><%= members[i].getBirthday() %></td>
-				<td><a>수정</a></td>
+				<td class='<%="m"+i%>'><%= members[i].getMemberNum() %></td>
+				<td class='<%="m"+i%>'><%= members[i].getmName() %></td>
+				<td class='<%="m"+i%>'><%= members[i].getGender() %></td>
+				<td class='<%="m"+i%>'><%= members[i].getPhone() %></td>
+				<td class='<%="m"+i%>'><%= members[i].getStartDay() %></td>
+				<td class='<%="m"+i%>'><%= members[i].getEndDay() %></td>
+				<td class='<%="m"+i%>'><%= members[i].getMemberType() %></td>
+				<td class='<%="m"+i%>'><%= members[i].getAddress() %></td>
+				<td class='<%="m"+i%>'><%= members[i].getBirthday() %></td>
+				<td class='update <%="update" + i%>'><span onclick='update(<%=i%>)'>수정</span></td>
 			</tr>
+			</form>
 			<% }} %>
 		</table>
 		<div class='page'>
@@ -79,4 +81,17 @@
 		var a = document.querySelector('.page a[href="?page=' + chPage + '"]');
 		a.removeAttribute('href');
 	}
+	
+	function update(i){
+		var button = document.querySelector('.update' + i);
+		button.innerHTML = "<a href=''>취소</a><input type='submit' value='적용'>";
+		//각 각 인풋 타입으로 .
+		var info = document.querySelectorAll('.m'+i);
+		var pk = info[0].innerText;
+		info[1].innerHTML = '<input name=\'mName\' type=\'text\' value=\'' + info[1].innerText + '\'>';
+		var gender = info[2].innerText;
+		info[2].innerHTML = '<input name=\'gender\' type=\'radio\' value=\'male\'>남자<input name=\'gender\' type=\'radio\' value=\'female\'>여자';
+		document.querySelector('.m' + i + ' input[type=radio][value=' + gender + ']').checked = true;
+	}
+	
 </script>

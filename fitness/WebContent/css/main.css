@@ -26,6 +26,10 @@
 	text-align: center;	
 }
 
+section {
+	min-height: 700px;
+}
+
 a {
 	text-decoration: none;
 }
