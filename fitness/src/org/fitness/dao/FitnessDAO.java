@@ -46,7 +46,7 @@ public class FitnessDAO {
 		
 		try {
 			stmt = conn.prepareStatement(sql);
-			stmt.setInt(1, TEST_NUM);			
+			stmt.setInt(1, TEST_NUM);
 			stmt.setString(2, member.getmName());
 			stmt.setString(3, member.getGender());
 			stmt.setDate(4, member.getStartDay());
@@ -57,6 +57,7 @@ public class FitnessDAO {
 			stmt.setDate(9, member.getBirthday());
 			int resultInt = stmt.executeUpdate();
 			if (resultInt > 0) {
+				//트렌젝션 찾아보질 못해서..
 				int memberNum = getMemberNum();
 				if (memberNum > 0) {
 					stmt = conn.prepareStatement("update member set membernum = " + memberNum + " where mname = '" + member.getmName() + "' and phone = '" + member.getPhone() + "'");
@@ -175,9 +176,14 @@ public class FitnessDAO {
 		Statement stmt = null;
 		ResultSet result = null;
 		
-		String sql = "select t2.membernum, mname, gender, startday, endday, phone, address, membertype, birthday " + 
-				"from (select membernum, rownum r from member) t1, member t2 " + 
-				"where t1.membernum = t2.membernum and r between " + (page - 1) + "1 and " + page + "0";
+//		String sql = "select t2.membernum, mname, gender, startday, endday, phone, address, membertype, birthday " + 
+//				"from (select membernum, rownum r from member) t1, member t2 " + 
+//				"where t1.membernum = t2.membernum and r between " + (page - 1) + "1 and " + page + "0";
+		
+		String sql = "select membernum, mname, gender, startday, endday, phone, address, membertype, birthday " + 
+				"from (select membernum, mname, gender, startday, endday, phone, address, membertype, birthday, rownum r from member) " + 
+				"where r between " + (page - 1) + "1 and " + page + "0";
+		
 		
 		try {
 			stmt = conn.createStatement();
@@ -206,20 +212,27 @@ public class FitnessDAO {
 		return null;
 	}
 
-	public int getPageNum(int pageNum) {
+	public int getPageCount(int pageNum) {
+		final int MAX_NAV_NUM = 10;
 		Connection conn = getConnection();
 		if (conn == null) return 0;
 		
 		Statement stmt = null;
 		ResultSet result = null;
 		
+		//String sql = "select trunc((count(membernum) - 1 -" + ((10* MAX_NAV_NUM) * ((pageNum - 1) / MAX_NAV_NUM)) + ") / 10 + 1) from member";
 		String sql = "select trunc((count(membernum) - 1 -" + (100 * ((pageNum - 1) / 10)) + ") / 10 + 1) from member";
 		
 		try {
 			stmt = conn.createStatement();
 			result = stmt.executeQuery(sql);
 			result.next();
-			return result.getInt(1);
+			int rt = result.getInt(1);
+			if (rt >= MAX_NAV_NUM) {
+				return MAX_NAV_NUM;
+			} else {
+				return rt;
+			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

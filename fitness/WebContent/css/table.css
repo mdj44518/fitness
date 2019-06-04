@@ -9,21 +9,32 @@
 	border-collapse: collapse;
 }
 
-.table .page {
+.table .pageNav {
 	margin-top: 20px;
 	text-align: center;
 }
 
  .table th, .table td {
+ 	height: 42px;
  	border: 1px solid black;
  	padding: 8px;
  	text-align: center;
  }
  
- .page a {
+ .pageNav a {
  	padding: 5px;
  }
  
-.update span {
-	cursor: pointer;
-}
+ 
+ 
+ 
+/*  style='width: 50px;'  */
+/*  style='width: 190px;' */
+/*  style='width: 115px;' */
+/*  style='width: 190px;' */
+/*  style='width: 160px;' */
+/*  style='width: 160px;' */
+/*  style='width: 100px;' */
+/*  style='width: 190px;' */
+/*  style='width: 160px;' */
+/*  style='width: 85px;'  */

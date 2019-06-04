@@ -57,24 +57,21 @@ public class adminController extends HttpServlet {
 		FitnessDAO dao = new FitnessDAO();
 		Member[] members = null;
 		//요청올때 page 숫자가 함께 넘어왔다면.
-		String test = (String)request.getParameter("page");
-		if (test == null) {
-			members = dao.getMemberList(1);
-			request.setAttribute("pageNum", dao.getPageNum(1));
+		String page = request.getParameter("page");
+		if (page != null) {
+			int i = Integer.parseInt(page);
+			members = dao.getMemberList(i);
+			request.setAttribute("chPage", i);
+			request.setAttribute("pCount", dao.getPageCount(i));
 		} else {
-			request.setAttribute("pageNum", dao.getPageNum(Integer.parseInt(test)));// 적절한가?
-			try {
-				members = dao.getMemberList(Integer.parseInt(test));
-				request.setAttribute("chPage", test);
-			} catch (Exception e) {
-				e.printStackTrace();
-				request.setAttribute("error", "요청하신 페이지가 존재하지 않습니다.");
-				request.getRequestDispatcher("/index.jsp").forward(request, response);
-				return;
-			}
+			//page 페라메타 없다면 첫페이지의 정보 요청
+			members = dao.getMemberList(1);
+			request.setAttribute("chPage", 1);
+			request.setAttribute("pCount", dao.getPageCount(1));
 		}
-		request.setAttribute("members", members);
-		if (members == null ) {
+		if (members != null ) {
+			request.setAttribute("members", members);
+		} else {
 			request.setAttribute("error", "데이터베이스 정보 조회에 실패하였습니다.");
 		}
 		request.getRequestDispatcher("/WEB-INF/views/memberList.jsp").forward(request, response);
