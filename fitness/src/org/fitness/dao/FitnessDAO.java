@@ -228,4 +228,38 @@ public class FitnessDAO {
 		}
 		return 0;
 	}
+
+	public int updateMember(Member member) {
+		Connection conn = getConnection();
+		if (conn == null) return -1;
+		
+		String sql = "update member set mname = ?, gender = ?, startday = ?, endday = ?, phone = ?, address = ?, membertype = ?, birthday = ? "
+				+ "where membernum = ?";
+		
+		PreparedStatement stmt = null;
+		ResultSet result = null;
+		
+		try {
+			stmt = conn.prepareStatement(sql);
+			stmt.setString(1, member.getmName());
+			stmt.setString(2, member.getGender());
+			stmt.setDate(3, member.getStartDay());
+			stmt.setDate(4, member.getEndDay());
+			stmt.setString(5, member.getPhone());
+			stmt.setString(6, member.getAddress());
+			stmt.setString(7, member.getMemberType());
+			stmt.setDate(8, member.getBirthday());
+			stmt.setInt(9, member.getMemberNum());
+			int resultInt = stmt.executeUpdate();
+			if (resultInt > 0) {
+				return member.getMemberNum();
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			endDAO(conn, stmt, result);
+		}
+		return -1;
+	}
 }

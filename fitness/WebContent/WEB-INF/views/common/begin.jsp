@@ -14,7 +14,7 @@
 <body>
 <header>
 	<div class='header'>
-		<h1><span style='cursor: pointer;' onclick='mainCall()'>Human</span></h1>
+		<h1><span class='mousePointer' onclick='mainCall()'>Human</span></h1>
 	</div>
 </header>
 <nav>

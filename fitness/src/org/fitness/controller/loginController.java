@@ -16,11 +16,11 @@ public class loginController extends HttpServlet {
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String[] tokens = request.getRequestURI().split("/");
-		String emd = tokens[tokens.length - 1];
+		String cmd = tokens[tokens.length - 1];
 		if (request.getParameter("out") != null) {
 			request.getSession().invalidate();
 			response.sendRedirect(request.getContextPath());
-		} else if (emd.equals("manager")) {
+		} else if (cmd.equals("manager")) {
 			request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);;
 		} else {
 			request.setAttribute("error", "요청하신 페이지가 존재하지 않습니다.");

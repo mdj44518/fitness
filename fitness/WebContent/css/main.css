@@ -33,3 +33,7 @@ section {
 a {
 	text-decoration: none;
 }
+
+.mousePointer {
+	cursor: pointer;
+}
