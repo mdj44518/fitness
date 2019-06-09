@@ -16,12 +16,12 @@ public class FitnessDAO {
 	private static final String url = "jdbc:oracle:thin:@localhost:1521:xe";
 	private static final String user = "fitness";
 	private static final String password = "1234";
+	private static Connection conn;
 	
-	private Connection getConnection() {
+	static {
 		try {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
-			Connection conn = DriverManager.getConnection(url, user, password);
-			return conn;
+			conn = DriverManager.getConnection(url, user, password);
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -29,11 +29,9 @@ public class FitnessDAO {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return null;
 	}
 	
 	public int addMember(Member member) {
-		Connection conn = getConnection();
 		if (conn == null) return -1;
 		//있는 회원인지 판독
 		if (existMember(member)) return -2;
@@ -72,31 +70,30 @@ public class FitnessDAO {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
-			endDAO(conn, stmt, result);
+			endDAO(stmt, result);
 		}
 		return -1;
 	}
 	
-	public static void main(String[] args) {
-		FitnessDAO dao = new FitnessDAO();
-		Member m = new Member();
-		m.setAddress("경기도");
-		m.setBirthday("2012-02-23");
-		m.setEndDay("2019-08-02");
-		m.setGender("male");
-		m.setMemberType("일반");
-		m.setmName("홍길동");
-		m.setPhone("010-1234-1234");
-		m.setStartDay("2019-06-01");
-		dao.addMember(m);
-		for (int i = 1; i <= 20; i++) {
-			m.setmName("홍군" + i);
-			dao.addMember(m);
-		}
-	}
+//	public static void main(String[] args) {
+//		FitnessDAO dao = new FitnessDAO();
+//		Member m = new Member();
+//		m.setAddress("경기도");
+//		m.setBirthday("2012-02-23");
+//		m.setEndDay("2019-08-02");
+//		m.setGender("male");
+//		m.setMemberType("일반");
+//		m.setmName("홍길동");
+//		m.setPhone("010-1234-1234");
+//		m.setStartDay("2019-06-01");
+//		dao.addMember(m);
+//		for (int i = 1; i <= 200; i++) {
+//			m.setmName("홍gog" + i);
+//			dao.addMember(m);
+//		}
+//	}
 
 	private int getMemberNum() {
-		Connection conn = getConnection();
 		if (conn == null) return -1;
 		String sql = "select membernum.nextval from dual";
 		Statement stmt = null;
@@ -111,14 +108,13 @@ public class FitnessDAO {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
-			endDAO(conn, stmt, result);
+			endDAO(stmt, result);
 		}
 		
 		return -1;
 	}
 
 	private boolean existMember(Member member) {
-		Connection conn = getConnection();
 		if (conn == null) return true;
 		
 		String sql = "select 1 from member where mname = ? and phone = ?";
@@ -136,21 +132,13 @@ public class FitnessDAO {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
-			endDAO(conn, stmt, result);
+			endDAO(stmt, result);
 		}
 		
 		return true;
 	}
 
-	private void endDAO(Connection conn, Statement stmt, ResultSet result) {
-		if (conn != null) {
-			try {
-				conn.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+	private void endDAO(Statement stmt, ResultSet result) {
 		if (stmt != null) {
 			try {
 				stmt.close();
@@ -170,7 +158,6 @@ public class FitnessDAO {
 	}
 
 	public Member[] getMemberList(int page) {
-		Connection conn = getConnection();
 		if (conn == null) return null;
 		
 		Statement stmt = null;
@@ -207,25 +194,27 @@ public class FitnessDAO {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
-			endDAO(conn, stmt, result);
+			endDAO(stmt, result);
 		}	
 		return null;
 	}
 
 	public int getPageCount(int pageNum) {
 		final int MAX_NAV_NUM = 10;
-		Connection conn = getConnection();
 		if (conn == null) return 0;
 		
-		Statement stmt = null;
+		PreparedStatement stmt = null;
 		ResultSet result = null;
 		
 		//String sql = "select trunc((count(membernum) - 1 -" + ((10* MAX_NAV_NUM) * ((pageNum - 1) / MAX_NAV_NUM)) + ") / 10 + 1) from member";
-		String sql = "select trunc((count(membernum) - 1 -" + (100 * ((pageNum - 1) / 10)) + ") / 10 + 1) from member";
+//		String sql = "select trunc((count(membernum) - 1 -" + (100 * ((pageNum - 1) / 10)) + ") / 10 + 1) from member";
+		String sql = "select (count(membernum) - 1 -?) / ? + 1 from member";
 		
 		try {
-			stmt = conn.createStatement();
-			result = stmt.executeQuery(sql);
+			stmt = conn.prepareStatement(sql);
+			stmt.setInt(1, (100 * ((pageNum - 1) / 10)));
+			stmt.setInt(2, 10);
+			result = stmt.executeQuery();
 			result.next();
 			int rt = result.getInt(1);
 			if (rt >= MAX_NAV_NUM) {
@@ -237,13 +226,12 @@ public class FitnessDAO {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
-			endDAO(conn, stmt, result);
+			endDAO(stmt, result);
 		}
 		return 0;
 	}
 
 	public int updateMember(Member member) {
-		Connection conn = getConnection();
 		if (conn == null) return -1;
 		
 		String sql = "update member set mname = ?, gender = ?, startday = ?, endday = ?, phone = ?, address = ?, membertype = ?, birthday = ? "
@@ -271,7 +259,7 @@ public class FitnessDAO {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
-			endDAO(conn, stmt, result);
+			endDAO(stmt, result);
 		}
 		return -1;
 	}
