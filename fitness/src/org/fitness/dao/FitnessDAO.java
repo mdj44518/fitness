@@ -12,11 +12,15 @@ import java.util.List;
 import org.fitness.model.Member;
 
 public class FitnessDAO {
+	private static final int MAX_NAV_NUM = 5;
+	private static final int PRINT_NUM = 10;
 	private static final int TEST_NUM = -1;
 	private static final String url = "jdbc:oracle:thin:@localhost:1521:xe";
 	private static final String user = "fitness";
 	private static final String password = "1234";
-	private static Connection conn;
+	private static Connection conn = null;
+	private static PreparedStatement stmt = null;
+	private static ResultSet result = null;
 	
 	static {
 		try {
@@ -31,7 +35,24 @@ public class FitnessDAO {
 		}
 	}
 	
+	
+//	private Connection getConnection() {
+//		try {
+//			Class.forName("oracle.jdbc.driver.OracleDriver");
+//			Connection conn = DriverManager.getConnection(url, user, password);
+//			return conn;
+//		} catch (ClassNotFoundException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (SQLException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		return null;
+//	}
+	
 	public int addMember(Member member) {
+//		Connection conn = getConnection();
 		if (conn == null) return -1;
 		//있는 회원인지 판독
 		if (existMember(member)) return -2;
@@ -39,8 +60,8 @@ public class FitnessDAO {
 		String sql = "insert into member (membernum, mname, gender, startday, endday, phone, address, membertype, birthday) "
 				+ "values(?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		
-		PreparedStatement stmt = null;
-		ResultSet result = null;
+//		PreparedStatement stmt = null;
+//		ResultSet result = null;
 		
 		try {
 			stmt = conn.prepareStatement(sql);
@@ -69,9 +90,10 @@ public class FitnessDAO {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} finally {
-			endDAO(stmt, result);
 		}
+//		finally {
+//			endDAO(conn, stmt, result);
+//		}
 		return -1;
 	}
 	
@@ -87,40 +109,43 @@ public class FitnessDAO {
 //		m.setPhone("010-1234-1234");
 //		m.setStartDay("2019-06-01");
 //		dao.addMember(m);
-//		for (int i = 1; i <= 200; i++) {
-//			m.setmName("홍gog" + i);
+//		for (int i = 1; i <= 4; i++) {
+//			m.setmName("홍홍길" + i);
 //			dao.addMember(m);
 //		}
 //	}
 
 	private int getMemberNum() {
+//		Connection conn = getConnection();
 		if (conn == null) return -1;
 		String sql = "select membernum.nextval from dual";
-		Statement stmt = null;
-		ResultSet result = null;
+//		Statement stmt = null;
+//		ResultSet result = null;
 		
 		try {
-			stmt = conn.createStatement();
-			result = stmt.executeQuery(sql);
+			stmt = conn.prepareStatement(sql);
+			result = stmt.executeQuery();
 			result.next();
 			return result.getInt(1);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} finally {
-			endDAO(stmt, result);
 		}
+//		finally {
+//			endDAO(conn, stmt, result);
+//		}
 		
 		return -1;
 	}
 
 	private boolean existMember(Member member) {
+//		Connection conn = getConnection();
 		if (conn == null) return true;
 		
 		String sql = "select 1 from member where mname = ? and phone = ?";
 		
-		PreparedStatement stmt = null;
-		ResultSet result = null;
+//		PreparedStatement stmt = null;
+//		ResultSet result = null;
 		
 		try {
 			stmt = conn.prepareStatement(sql);
@@ -131,37 +156,47 @@ public class FitnessDAO {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} finally {
-			endDAO(stmt, result);
-		}
+		} 
+//		finally {
+//			endDAO(conn, stmt, result);
+//		}
 		
 		return true;
 	}
 
-	private void endDAO(Statement stmt, ResultSet result) {
-		if (stmt != null) {
-			try {
-				stmt.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		if (result != null) {
-			try {
-				result.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-	}
+//	private void endDAO(Connection conn, Statement stmt, ResultSet result) {
+//		if (conn != null) {
+//			try {
+//				conn.close();
+//			} catch (SQLException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
+//		if (stmt != null) {
+//			try {
+//				stmt.close();
+//			} catch (SQLException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
+//		if (result != null) {
+//			try {
+//				result.close();
+//			} catch (SQLException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
+//	}
 
 	public Member[] getMemberList(int page) {
+//		Connection conn = getConnection();
 		if (conn == null) return null;
 		
-		Statement stmt = null;
-		ResultSet result = null;
+//		Statement stmt = null;
+//		ResultSet result = null;
 		
 //		String sql = "select t2.membernum, mname, gender, startday, endday, phone, address, membertype, birthday " + 
 //				"from (select membernum, rownum r from member) t1, member t2 " + 
@@ -169,12 +204,12 @@ public class FitnessDAO {
 		
 		String sql = "select membernum, mname, gender, startday, endday, phone, address, membertype, birthday " + 
 				"from (select membernum, mname, gender, startday, endday, phone, address, membertype, birthday, rownum r from member) " + 
-				"where r between " + (page - 1) + "1 and " + page + "0";
+				"where r between " + (page * PRINT_NUM - PRINT_NUM + 1) + " and " + (page * PRINT_NUM);
 		
 		
 		try {
-			stmt = conn.createStatement();
-			result = stmt.executeQuery(sql);
+			stmt = conn.prepareStatement(sql);
+			result = stmt.executeQuery();
 			List<Member> mList = new ArrayList<>();
 			while (result.next()) {
 				Member m = new Member();
@@ -193,27 +228,25 @@ public class FitnessDAO {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} finally {
-			endDAO(stmt, result);
-		}	
+		}
+//		finally {
+//			endDAO(conn, stmt, result);
+//		}	
 		return null;
 	}
 
 	public int getPageCount(int pageNum) {
-		final int MAX_NAV_NUM = 10;
+//		Connection conn = getConnection();
 		if (conn == null) return 0;
 		
-		PreparedStatement stmt = null;
-		ResultSet result = null;
+//		Statement stmt = null;
+//		ResultSet result = null;
 		
-		//String sql = "select trunc((count(membernum) - 1 -" + ((10* MAX_NAV_NUM) * ((pageNum - 1) / MAX_NAV_NUM)) + ") / 10 + 1) from member";
+		String sql = "select trunc((count(membernum) - 1 -" + ((PRINT_NUM * MAX_NAV_NUM) * ((pageNum - 1) / MAX_NAV_NUM)) + ") / " + PRINT_NUM + " + 1) from member";
 //		String sql = "select trunc((count(membernum) - 1 -" + (100 * ((pageNum - 1) / 10)) + ") / 10 + 1) from member";
-		String sql = "select (count(membernum) - 1 -?) / ? + 1 from member";
 		
 		try {
 			stmt = conn.prepareStatement(sql);
-			stmt.setInt(1, (100 * ((pageNum - 1) / 10)));
-			stmt.setInt(2, 10);
 			result = stmt.executeQuery();
 			result.next();
 			int rt = result.getInt(1);
@@ -225,20 +258,22 @@ public class FitnessDAO {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} finally {
-			endDAO(stmt, result);
 		}
+//		finally {
+//			endDAO(conn, stmt, result);
+//		}
 		return 0;
 	}
 
 	public int updateMember(Member member) {
+//		Connection conn = getConnection();
 		if (conn == null) return -1;
 		
 		String sql = "update member set mname = ?, gender = ?, startday = ?, endday = ?, phone = ?, address = ?, membertype = ?, birthday = ? "
 				+ "where membernum = ?";
 		
-		PreparedStatement stmt = null;
-		ResultSet result = null;
+//		PreparedStatement stmt = null;
+//		ResultSet result = null;
 		
 		try {
 			stmt = conn.prepareStatement(sql);
@@ -258,9 +293,10 @@ public class FitnessDAO {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} finally {
-			endDAO(stmt, result);
-		}
+		} 
+//		finally {
+//			endDAO(conn, stmt, result);
+//		}
 		return -1;
 	}
 }

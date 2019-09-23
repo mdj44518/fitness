@@ -61,12 +61,12 @@ public class adminController extends HttpServlet {
 		if (page != null) {
 			int i = Integer.parseInt(page);
 			members = dao.getMemberList(i);
-//			request.setAttribute("chPage", i);
+			request.setAttribute("chPage", i);//???없어도될까?
 			request.setAttribute("pCount", dao.getPageCount(i));
 		} else {
 			//page 페라메타 없다면 첫페이지의 정보 요청
 			members = dao.getMemberList(1);
-//			request.setAttribute("chPage", 1);
+			request.setAttribute("chPage", 1);
 			request.setAttribute("pCount", dao.getPageCount(1));
 		}
 		if (members != null ) {
